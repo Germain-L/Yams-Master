@@ -1,6 +1,6 @@
-import React, { useEffect, useState, useContext } from "react";
-import { StyleSheet, Text, View } from "react-native";
-import { SocketContext } from '../contexts/socket.context';
+import React, {useEffect, useState, useContext} from "react";
+import {Button, StyleSheet, Text, View} from "react-native";
+import {SocketContext} from '../contexts/socket.context';
 
 
 export default function OnlineGameController() {
@@ -10,6 +10,10 @@ export default function OnlineGameController() {
     const [inQueue, setInQueue] = useState(false);
     const [inGame, setInGame] = useState(false);
     const [idOpponent, setIdOpponent] = useState(null);
+
+    const leaveQueue = () => {
+        socket.emit("queue.leave");
+    }
 
     useEffect(() => {
         console.log('[emit][queue.join]:', socket.id);
@@ -30,6 +34,11 @@ export default function OnlineGameController() {
             setIdOpponent(data['idOpponent']);
         });
 
+        socket.on('game.leave', () => {
+            // TODO
+            // navigation.navigate('game');
+        })
+
     }, []);
 
     return (
@@ -47,6 +56,8 @@ export default function OnlineGameController() {
                     <Text style={styles.paragraph}>
                         Waiting for another player...
                     </Text>
+                    <Button title="Quit queue" onPress={() => leaveQueue()}>
+                    </Button>
                 </>
             )}
 
