@@ -1,10 +1,9 @@
-// app/screens/online-game.screen.js
+import React, {useContext} from "react";
+import {StyleSheet, View, Button, Text} from "react-native";
+import {SocketContext} from '../contexts/socket.context';
+import OnlineGameController from "../controllers/online-game.controller";
 
-import React, { useContext } from "react";
-import { StyleSheet, View, Button, Text } from "react-native";
-import { SocketContext } from '../contexts/socket.context';
-
-export default function OnlineGameScreen({ navigation }) {
+export default function OnlineGameScreen({navigation}) {
 
     const socket = useContext(SocketContext);
 
@@ -23,16 +22,7 @@ export default function OnlineGameScreen({ navigation }) {
 
             {socket && (
                 <>
-                    <Text style={styles.paragraph}>
-                        Online Game Interface
-                    </Text>
-                    <Text style={styles.footnote}>
-                        My socket id is: {socket.id}
-                    </Text>
-                    <Button
-                        title="Revenir au menu"
-                        onPress={() => navigation.navigate('HomeScreen')}
-                    />
+                    <OnlineGameController/>
                 </>
             )}
         </View>
