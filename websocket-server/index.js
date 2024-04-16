@@ -3,6 +3,7 @@ const http = require('http').Server(app);
 const io = require('socket.io')(http);
 var uniqid = require('uniqid');
 const GameService = require('./services/game.service');
+const {socket} = require("../app/contexts/socket.context");
 
 // ---------------------------------------------------
 // -------- CONSTANTS AND GLOBAL VARIABLES -----------
@@ -13,6 +14,16 @@ let queue = [];
 // ---------------------------------
 // -------- GAME METHODS -----------
 // ---------------------------------
+
+const updateClientsViewTimers = (game) => {
+    game.player1Socket.emit('game.timer', GameService.send.forPlayer.gameTimer('player:1', game.gameState));
+    game.player2Socket.emit('game.timer', GameService.send.forPlayer.gameTimer('player:2', game.gameState));
+}
+
+const updateClientsViewDecks = (game) => {
+    game['player1Socket'].emit("game.deck.view-state", GameService.send.forPlayer.deckViewState('player:1', game.gameState));
+    game['player1Socket'].emit("game.deck.view-state", GameService.send.forPlayer.deckViewState('player:2', game.gameState));
+}
 
 const newPlayerInQueue = (socket) => {
 
@@ -39,6 +50,8 @@ const createGame = (player1Socket, player2Socket) => {
     games.push(newGame);
 
     const gameIndex = GameService.utils.findGameIndexById(games, newGame.idGame);
+    player1Socket.emit("game.start", GameService.send.forPlayer.deckViewState(player1Socket, games[gameIndex].gameState));
+    player2Socket.emit("game.start", GameService.send.forPlayer.deckViewState(player2Socket, games[gameIndex].gameState));
 
     const gameInterval = setInterval(() => {
 
@@ -52,12 +65,13 @@ const createGame = (player1Socket, player2Socket) => {
 
             // Méthode du service qui renvoie la constante 'TURN_DURATION'
             games[gameIndex].gameState.timer = GameService.timer.getTurnDuration();
+
+            games[gameIndex].gameState.deck = GameService.init.deck();
+            updateClientsViewTimers();
         }
 
         // On notifie finalement les clients que les données sont mises à jour.
-        games[gameIndex].player1Socket.emit('game.timer', GameService.send.forPlayer.gameTimer('player:1', games[gameIndex].gameState));
-        games[gameIndex].player2Socket.emit('game.timer', GameService.send.forPlayer.gameTimer('player:2', games[gameIndex].gameState));
-
+        updateClientsViewDecks(games[gameIndex]);
     }, 1000);
 
     // On prévoit de couper l'horloge
@@ -74,11 +88,14 @@ const createGame = (player1Socket, player2Socket) => {
     games[gameIndex].player2Socket.emit('game.start', GameService.send.forPlayer.viewGameState('player:2', games[gameIndex]));
 };
 
+const rollDices = (socket) => {
+    const game = GameService.utils.findGameIndexBySocketId(socket);
+    // TODO: finish
+}
+
 const removePlayerFromQueue = (socket) => {
-    // TODO: fixme, emit is not a function
     const indexOfSocket = queue.indexOf(socket)
     queue.splice(indexOfSocket, 1);
-
 }
 
 // ---------------------------------------
@@ -102,6 +119,11 @@ io.on('connection', socket => {
     socket.on('disconnect', reason => {
         console.log(`[${socket.id}] socket disconnected - ${reason}`);
     });
+
+    socket.on('game.dices.roll', () => {
+        console.log(`[${socket.id}] roll roll`);
+        rollDices();
+    })
 });
 
 // -----------------------------------

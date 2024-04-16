@@ -6,14 +6,13 @@ import Dice from "./dice.component";
 const PlayerDeck = () => {
 
     const socket = useContext(SocketContext);
-    const [displayPlayerDeck, setDisplayPlayerDeck] = useState(false);
+    const [displayPlayerDeck, setDisplayPlayerDeck] = useState(true);
     const [dices, setDices] = useState(Array(5).fill(false));
     const [displayRollButton, setDisplayRollButton] = useState(false);
     const [rollsCounter, setRollsCounter] = useState(0);
     const [rollsMaximum, setRollsMaximum] = useState(3);
 
     useEffect(() => {
-
         socket.on("game.deck.view-state", (data) => {
             setDisplayPlayerDeck(data['displayPlayerDeck']);
             if (data['displayPlayerDeck']) {
