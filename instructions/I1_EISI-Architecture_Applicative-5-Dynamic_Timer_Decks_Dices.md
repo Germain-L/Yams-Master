@@ -230,7 +230,7 @@ Cela consistera donc à manipuler des sockets, effectuer des actions sur le ```g
     - ```rollsMaximum``` : Nombre maximum de lancers.
   - socket.on :
     - ```game.deck.view-state``` : Met à jour tous ses 'useState'.
-  - socket.on :
+  - socket.emit :
     - ```game.dices.roll``` : Clic sur bouton. 'Roll'
     - ```game.dices.lock``` : Clic sur un dé.
 
