@@ -3,7 +3,7 @@ import {Button, StyleSheet, Text, View} from "react-native";
 import {SocketContext} from '../contexts/socket.context';
 
 
-export default function OnlineGameController() {
+export default function OnlineGameController({navigation}) {
 
     const socket = useContext(SocketContext);
 
@@ -36,7 +36,7 @@ export default function OnlineGameController() {
 
         socket.on('game.leave', () => {
             // TODO
-            // navigation.navigate('game');
+            navigation.navigate('game');
         })
 
     }, []);
