@@ -45,11 +45,10 @@ const createGame = (player1Socket, player2Socket) => {
 };
 
 const removePlayerFromQueue = (socket) => {
-    console.log(queue)
+    // TODO: fixme, emit is not a function
     const indexOfSocket = queue.indexOf(socket)
-    const playerSocker = queue.splice(indexOfSocket, 1);
-    console.log(queue)
-    playerSocker.emit("game.leave");
+    queue.splice(indexOfSocket, 1);
+
 }
 
 // ---------------------------------------
@@ -67,6 +66,7 @@ io.on('connection', socket => {
     socket.on('queue.leave', () => {
         console.log(`[${socket.id}] left the queue`);
         removePlayerFromQueue(socket);
+        socket.emit("game.leave", GameService.send.forPlayer.viewQueueState());
     })
 
     socket.on('disconnect', reason => {

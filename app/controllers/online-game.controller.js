@@ -1,6 +1,7 @@
 import React, {useEffect, useState, useContext} from "react";
 import {Button, StyleSheet, Text, View} from "react-native";
 import {SocketContext} from '../contexts/socket.context';
+import BoardComponent from "../components/board/board.component";
 
 
 export default function OnlineGameController({navigation}) {
@@ -34,10 +35,10 @@ export default function OnlineGameController({navigation}) {
             setIdOpponent(data['idOpponent']);
         });
 
-        socket.on('game.leave', () => {
-            // TODO
-            navigation.navigate('home');
-        })
+        socket.on('queue.leave', () => {
+            console.log("leaving queue")
+            navigation.navigate('HomeScreen')
+    });
 
     }, []);
 
@@ -63,18 +64,19 @@ export default function OnlineGameController({navigation}) {
 
             {inGame && (
                 <>
-                    <Text style={styles.paragraph}>
-                        Game found !
-                    </Text>
-                    <Text style={styles.paragraph}>
-                        Player - {socket.id} -
-                    </Text>
-                    <Text style={styles.paragraph}>
-                        - vs -
-                    </Text>
-                    <Text style={styles.paragraph}>
-                        Player - {idOpponent} -
-                    </Text>
+                    <BoardComponent/>
+                    {/*<Text style={styles.paragraph}>*/}
+                    {/*    Game found !*/}
+                    {/*</Text>*/}
+                    {/*<Text style={styles.paragraph}>*/}
+                    {/*    Player - {socket.id} -*/}
+                    {/*</Text>*/}
+                    {/*<Text style={styles.paragraph}>*/}
+                    {/*    - vs -*/}
+                    {/*</Text>*/}
+                    {/*<Text style={styles.paragraph}>*/}
+                    {/*    Player - {idOpponent} -*/}
+                    {/*</Text>*/}
                 </>
             )}
         </View>
