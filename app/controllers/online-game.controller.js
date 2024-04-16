@@ -36,7 +36,7 @@ export default function OnlineGameController({navigation}) {
 
         socket.on('game.leave', () => {
             // TODO
-            navigation.navigate('game');
+            navigation.navigate('home');
         })
 
     }, []);
