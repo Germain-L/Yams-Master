@@ -1,20 +1,14 @@
 // app/components/board/board.component.js
 
 import React from "react";
-import { View, Text, StyleSheet } from 'react-native';
+import {View, Text, StyleSheet} from 'react-native';
+import OpponentTimer from "./timers/opponent-timer.component";
+import PlayerTimer from "./timers/player-timer.component";
 
 const OpponentInfos = () => {
     return (
         <View style={styles.opponentInfosContainer}>
             <Text>Opponent infos</Text>
-        </View>
-    );
-};
-
-const OpponentTimer = () => {
-    return (
-        <View style={styles.opponentTimerContainer}>
-            <Text>Timer: </Text>
         </View>
     );
 };
@@ -70,15 +64,6 @@ const PlayerInfos = () => {
     );
 };
 
-const PlayerTimer = () => {
-
-    return (
-        <View style={styles.playerTimerContainer}>
-            <Text>Timer: </Text>
-        </View>
-    );
-};
-
 const PlayerScore = () => {
 
     return (
@@ -89,32 +74,31 @@ const PlayerScore = () => {
 };
 
 
-
-const Board = ({ gameViewState}) => {
+const Board = ({gameViewState}) => {
     return (
         <View style={styles.container}>
-            <View style={[styles.row, { height: '5%' }]}>
-                <OpponentInfos />
+            <View style={[styles.row, {height: '5%'}]}>
+                <OpponentInfos/>
                 <View style={styles.opponentTimerScoreContainer}>
-                    <OpponentTimer />
-                    <OpponentScore />
+                    <OpponentTimer/>
+                    <OpponentScore/>
                 </View>
             </View>
-            <View style={[styles.row, { height: '25%' }]}>
-                <OpponentDeck />
+            <View style={[styles.row, {height: '25%'}]}>
+                <OpponentDeck/>
             </View>
-            <View style={[styles.row, { height: '40%' }]}>
-                <Grid />
-                <Choices />
+            <View style={[styles.row, {height: '40%'}]}>
+                <Grid/>
+                <Choices/>
             </View>
-            <View style={[styles.row, { height: '25%' }]}>
-                <PlayerDeck />
+            <View style={[styles.row, {height: '25%'}]}>
+                <PlayerDeck/>
             </View>
-            <View style={[styles.row, { height: '5%' }]}>
-                <PlayerInfos />
+            <View style={[styles.row, {height: '5%'}]}>
+                <PlayerInfos/>
                 <View style={styles.playerTimerScoreContainer}>
-                    <PlayerTimer />
-                    <PlayerScore />
+                    <PlayerTimer/>
+                    <PlayerScore/>
                 </View>
             </View>
         </View>
@@ -151,11 +135,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         backgroundColor: "lightgrey"
     },
-    opponentTimerContainer: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
+
     opponentScoreContainer: {
         flex: 1,
         justifyContent: 'center',
@@ -198,12 +178,6 @@ const styles = StyleSheet.create({
     playerTimerScoreContainer: {
         flex: 3,
         flexDirection: 'column',
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: "lightgrey"
-    },
-    playerTimerContainer: {
-        flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
         backgroundColor: "lightgrey"
