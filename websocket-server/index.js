@@ -30,7 +30,7 @@ const updateTimer = (gameIndex) => {
     games[gameIndex].player2Socket.emit('game.timer', GameService.send.forPlayer.gameTimer('player:2', games[gameIndex].gameState));
 }
 
-const sendGrid = (gameIndex) => {
+const updateGrid = (gameIndex) => {
     setTimeout(() => {
         games[gameIndex].player1Socket.emit('game.grid.view-state', GameService.send.forPlayer.gridViewState('player:1', games[gameIndex].gameState));
         games[gameIndex].player2Socket.emit('game.grid.view-state', GameService.send.forPlayer.gridViewState('player:2', games[gameIndex].gameState));
@@ -82,8 +82,10 @@ const createGame = (player1Socket, player2Socket) => {
             // Réinitialisation du deck
             games[gameIndex].gameState.deck = GameService.init.deck();
             games[gameIndex].gameState.choices = GameService.init.choices();
+            games[gameIndex].gameState.grid = GameService.grid.resetcanBeCheckedCells();
             updateDecks(gameIndex);
             updateChoices(gameIndex);
+            updateGrid(gameIndex);
         }
 
         // On notifie finalement les clients que les données sont mises à jour.
@@ -103,7 +105,7 @@ const createGame = (player1Socket, player2Socket) => {
     games[gameIndex].player1Socket.emit('game.start', GameService.send.forPlayer.viewGameState('player:1', games[gameIndex]));
     games[gameIndex].player2Socket.emit('game.start', GameService.send.forPlayer.viewGameState('player:2', games[gameIndex]));
 
-    sendGrid(gameIndex);
+    updateGrid(gameIndex);
     updateDecks(gameIndex);
 };
 
@@ -155,7 +157,30 @@ const chooseChoice = (socket, data) => {
     const gameIndex = GameService.utils.findGameIndexBySocketId(games, socket.id);
     games[gameIndex].gameState.choices.idSelectedChoice = data.choiceId;
 
-    updateChoices(gameIndex);
+    // La sélection d'une cellule signifie la fin du tour (ou plus tard le check des conditions de victoires)
+    // On reset l'état des cases qui étaient précédemment clicables.
+    games[gameIndex].gameState.grid = GameService.grid.resetcanBeCheckedCells(games[gameIndex].gameState.grid);
+    games[gameIndex].gameState.grid = GameService.grid.selectCell(data.cellId, data.rowIndex, data.cellIndex, games[gameIndex].gameState.currentTurn, games[gameIndex].gameState.grid);
+
+    // TODO: Ici calculer le score
+    // TODO: Puis check si la partie s'arrête (lines / diagolales / no-more-gametokens)
+
+    // Sinon on finit le tour
+    games[gameIndex].gameState.currentTurn = games[gameIndex].gameState.currentTurn === 'player:1' ? 'player:2' : 'player:1';
+    games[gameIndex].gameState.timer = GameService.timer.getTurnDuration();
+
+    // On remet le deck et les choix à zéro (la grille, elle, ne change pas)
+    games[gameIndex].gameState.deck = GameService.init.deck();
+    games[gameIndex].gameState.choices = GameService.init.choices();
+
+    // On reset le timer
+    games[gameIndex].player1Socket.emit('game.timer', GameService.send.forPlayer.gameTimer('player:1', games[gameIndex].gameState));
+    games[gameIndex].player2Socket.emit('game.timer', GameService.send.forPlayer.gameTimer('player:2', games[gameIndex].gameState));
+
+    // et on remet à jour la vue
+    updateDecks(games[gameIndex]);
+    updateChoices(games[gameIndex]);
+    updateGrid(games[gameIndex]);
 }
 
 // ---------------------------------------
