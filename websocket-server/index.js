@@ -14,14 +14,20 @@ let queue = [];
 // -------- GAME METHODS -----------
 // ---------------------------------
 
-const updateClientsViewTimers = (game) => {
-    game.player1Socket.emit('game.timer', GameService.send.forPlayer.gameTimer('player:1', game.gameState));
-    game.player2Socket.emit('game.timer', GameService.send.forPlayer.gameTimer('player:2', game.gameState));
+const updateDecks = (gameIndex) => setTimeout(() => {
+    const gameState = games[gameIndex].gameState;
+    games[gameIndex].player1Socket.emit('game.deck.view-state', GameService.send.forPlayer.deckViewState('player:1', gameState));
+    games[gameIndex].player2Socket.emit('game.deck.view-state', GameService.send.forPlayer.deckViewState('player:2', gameState));
+}, 200);
+
+const setTimerTo5 = (gameIndex) => {
+    games[gameIndex].gameState.timer = 5;
+    updateTimer(gameIndex);
 }
 
-const updateClientsViewDecks = (game) => {
-    game['player1Socket'].emit("game.deck.view-state", GameService.send.forPlayer.deckViewState('player:1', game.gameState));
-    game['player1Socket'].emit("game.deck.view-state", GameService.send.forPlayer.deckViewState('player:2', game.gameState));
+const updateTimer = (gameIndex) => {
+    games[gameIndex].player1Socket.emit('game.timer', GameService.send.forPlayer.gameTimer('player:1', games[gameIndex].gameState));
+    games[gameIndex].player2Socket.emit('game.timer', GameService.send.forPlayer.gameTimer('player:2', games[gameIndex].gameState));
 }
 
 const newPlayerInQueue = (socket) => {
@@ -33,8 +39,7 @@ const newPlayerInQueue = (socket) => {
         const player1Socket = queue.shift();
         const player2Socket = queue.shift();
         createGame(player1Socket, player2Socket);
-    }
-    else {
+    } else {
         socket.emit('queue.added', GameService.send.forPlayer.viewQueueState());
     }
 };
@@ -49,9 +54,6 @@ const createGame = (player1Socket, player2Socket) => {
     games.push(newGame);
 
     const gameIndex = GameService.utils.findGameIndexById(games, newGame.idGame);
-    player1Socket.emit("game.start", GameService.send.forPlayer.deckViewState(player1Socket, games[gameIndex].gameState));
-    player2Socket.emit("game.start", GameService.send.forPlayer.deckViewState(player2Socket, games[gameIndex].gameState));
-
     const gameInterval = setInterval(() => {
 
         games[gameIndex].gameState.timer--;
@@ -65,12 +67,13 @@ const createGame = (player1Socket, player2Socket) => {
             // Méthode du service qui renvoie la constante 'TURN_DURATION'
             games[gameIndex].gameState.timer = GameService.timer.getTurnDuration();
 
+            // Réinitialisation du deck
             games[gameIndex].gameState.deck = GameService.init.deck();
-            updateClientsViewTimers();
+            updateDecks(gameIndex);
         }
 
         // On notifie finalement les clients que les données sont mises à jour.
-        updateClientsViewDecks(games[gameIndex]);
+        updateTimer(gameIndex);
     }, 1000);
 
     // On prévoit de couper l'horloge
@@ -85,16 +88,38 @@ const createGame = (player1Socket, player2Socket) => {
 
     games[gameIndex].player1Socket.emit('game.start', GameService.send.forPlayer.viewGameState('player:1', games[gameIndex]));
     games[gameIndex].player2Socket.emit('game.start', GameService.send.forPlayer.viewGameState('player:2', games[gameIndex]));
+
+    updateDecks(gameIndex);
 };
 
 const rollDices = (socket) => {
-    const game = GameService.utils.findGameIndexBySocketId(socket);
-    // TODO: finish
+    const gameIndex = GameService.utils.findGameIndexBySocketId(games, socket.id);
+    const gameState = games[gameIndex].gameState;
+    const rollNumber = gameState.deck.rollsCounter;
+    const totalRolls = gameState.deck.rollsMaximum;
+
+    if (totalRolls - rollNumber >= 1) {
+        games[gameIndex].gameState.deck.dices = GameService.dices.roll(gameState.deck.dices);
+        games[gameIndex].gameState.deck.rollsCounter++;
+        updateDecks(gameIndex);
+    } else {
+        games[gameIndex].gameState.deck.dices = GameService.dices.lockEveryDice(GameService.dices.roll(gameState.deck.dices));
+        games[gameIndex].gameState.deck.rollsCounter++;
+        updateDecks(gameIndex);
+        setTimerTo5(gameIndex)
+    }
 }
 
 const removePlayerFromQueue = (socket) => {
     const indexOfSocket = queue.indexOf(socket)
     queue.splice(indexOfSocket, 1);
+}
+
+const lockDice = (socket, diceId) => {
+    const gameIndex = GameService.utils.findGameIndexBySocketId(games, socket.id);
+    const diceIndex = GameService.utils.findDiceIndexByDiceId(games[gameIndex].gameState.deck.dices, diceId);
+    games[gameIndex].gameState.deck.dices[diceIndex].locked = !games[gameIndex].gameState.deck.dices[diceIndex].locked;
+    updateDecks(gameIndex);
 }
 
 // ---------------------------------------
@@ -120,9 +145,12 @@ io.on('connection', socket => {
     });
 
     socket.on('game.dices.roll', () => {
-        console.log(`[${socket.id}] roll roll`);
-        rollDices();
-    })
+        rollDices(socket);
+    });
+
+    socket.on('game.dices.lock', (idDice) => {
+        lockDice(socket, idDice);
+    });
 });
 
 // -----------------------------------
@@ -131,6 +159,6 @@ io.on('connection', socket => {
 
 app.get('/', (req, res) => res.sendFile('index.html'));
 
-http.listen(3000, function(){
+http.listen(3000, function () {
     console.log('listening on *:3000');
 });
