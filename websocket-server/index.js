@@ -1,19 +1,6 @@
 const app = require('express')();
 const http = require('http').Server(app);
-const io = require("socket.io")(http, {
-    cors: {
-        origin: "*",
-        methods: ["GET", "POST"],
-    },
-});
-
-app.use(cors({
-    origin: [
-        "https://yams-master-production.up.railway.app",
-        // Add any other domains that need access here
-    ]
-}));
-
+const io = require("socket.io");
 var uniqid = require('uniqid');
 const GameService = require('./services/game.service');
 
@@ -242,6 +229,6 @@ io.on('connection', socket => {
 
 app.get('/', (req, res) => res.sendFile('index.html'));
 
-http.listen(443, function () {
-    console.log('listening on *:443');
+http.listen(3000, function () {
+    console.log('listening on *:3000');
 });
