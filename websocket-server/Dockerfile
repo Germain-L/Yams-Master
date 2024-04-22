@@ -8,4 +8,4 @@ RUN npm ci
 
 COPY . /app
 
-ENTRYPOINT ["node", "index.js"]
+ENTRYPOINT ["node", "websocket-server/index.js"]
