@@ -82,7 +82,7 @@ const createGame = (player1Socket, player2Socket) => {
             // Réinitialisation du deck
             games[gameIndex].gameState.deck = GameService.init.deck();
             games[gameIndex].gameState.choices = GameService.init.choices();
-            games[gameIndex].gameState.grid = GameService.grid.resetcanBeCheckedCells();
+            games[gameIndex].gameState.grid = GameService.grid.resetCanBeCheckedCells(games[gameIndex].gameState.grid);
             updateDecks(gameIndex);
             updateChoices(gameIndex);
             updateGrid(gameIndex);
@@ -129,9 +129,7 @@ const rollDices = (socket) => {
     const dices = [ ...games[gameIndex].gameState.deck.dices];
     const isDefi = false;
     const isSec = games[gameIndex].gameState.deck.rollsCounter === 2;
-    const combinations = GameService.choices.findCombinations(dices, isDefi, isSec);
-
-    games[gameIndex].gameState.choices.availableChoices = combinations;
+    games[gameIndex].gameState.choices.availableChoices = GameService.choices.findCombinations(dices, isDefi, isSec);
 
     updateChoices(gameIndex);
 }
@@ -149,8 +147,13 @@ const lockDice = (socket, diceId) => {
     updateDecks(gameIndex);
 }
 
-const rollAndDoCombinations = (socket) => {
+const showChoices = (socket, data) => {
+    const gameIndex = GameService.utils.findGameIndexBySocketId(games, socket.id);
+    games[gameIndex].gameState.choices.idSelectedChoice = data.choiceId;
+    games[gameIndex].gameState.grid = GameService.grid.resetCanBeCheckedCells(games[gameIndex].gameState.grid);
+    games[gameIndex].gameState.grid = GameService.grid.updateGridAfterSelectingChoice(data.choiceId, games[gameIndex].gameState.grid);
 
+    updateGrid(gameIndex);
 }
 
 const chooseChoice = (socket, data) => {
@@ -159,7 +162,7 @@ const chooseChoice = (socket, data) => {
 
     // La sélection d'une cellule signifie la fin du tour (ou plus tard le check des conditions de victoires)
     // On reset l'état des cases qui étaient précédemment clicables.
-    games[gameIndex].gameState.grid = GameService.grid.resetcanBeCheckedCells(games[gameIndex].gameState.grid);
+    games[gameIndex].gameState.grid = GameService.grid.resetCanBeCheckedCells(games[gameIndex].gameState.grid);
     games[gameIndex].gameState.grid = GameService.grid.selectCell(data.cellId, data.rowIndex, data.cellIndex, games[gameIndex].gameState.currentTurn, games[gameIndex].gameState.grid);
 
     // TODO: Ici calculer le score
@@ -178,9 +181,9 @@ const chooseChoice = (socket, data) => {
     games[gameIndex].player2Socket.emit('game.timer', GameService.send.forPlayer.gameTimer('player:2', games[gameIndex].gameState));
 
     // et on remet à jour la vue
-    updateDecks(games[gameIndex]);
-    updateChoices(games[gameIndex]);
-    updateGrid(games[gameIndex]);
+    updateDecks(gameIndex);
+    updateChoices(gameIndex);
+    updateGrid(gameIndex);
 }
 
 // ---------------------------------------
@@ -209,10 +212,13 @@ io.on('connection', socket => {
 
     socket.on('game.dices.roll', () => {
         rollDices(socket);
-        rollAndDoCombinations(socket);
     })
 
     socket.on('game.choices.selected', (data) => {
+        showChoices(socket, data);
+    })
+
+    socket.on('game.grid.selected', (data) => {
         chooseChoice(socket, data)
     })
 });
