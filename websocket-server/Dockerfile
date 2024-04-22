@@ -6,6 +6,6 @@ COPY ../package.json package-lock.json ./
 
 RUN npm ci
 
-COPY . /app
+COPY ./websocket-server /app
 
 ENTRYPOINT ["node", "websocket-server/index.js"]
