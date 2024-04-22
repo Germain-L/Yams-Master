@@ -6,6 +6,6 @@ COPY ../package.json package-lock.json ./
 
 RUN npm ci
 
-COPY . .
+COPY . /app
 
 ENTRYPOINT ["node", "index.js"]
