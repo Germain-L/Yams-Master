@@ -4,7 +4,7 @@ import io from "socket.io-client";
 
 console.log('Emulation OS Platform: ', Platform.OS);
 // Also usable : "http://10.0.2.2:3000"
-export const socketEndpoint = "https://yams-master-production.up.railway.app:3000";
+export const socketEndpoint = "https://yams-master-production.up.railway.app/";
 
 export const socket = io(socketEndpoint, {
     transports: ["websocket"],

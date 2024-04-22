@@ -7,6 +7,13 @@ const io = require("socket.io")(http, {
     },
 });
 
+app.use(cors({
+    origin: [
+        "https://yams-master-production.up.railway.app",
+        // Add any other domains that need access here
+    ]
+}));
+
 var uniqid = require('uniqid');
 const GameService = require('./services/game.service');
 
