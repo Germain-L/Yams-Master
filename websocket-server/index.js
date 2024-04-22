@@ -132,7 +132,7 @@ const rollDices = (socket) => {
         setTimerTo5(gameIndex)
     }
 
-    const dices = [ ...games[gameIndex].gameState.deck.dices];
+    const dices = [...games[gameIndex].gameState.deck.dices];
     const isDefi = false;
     const isSec = games[gameIndex].gameState.deck.rollsCounter === 2;
     games[gameIndex].gameState.choices.availableChoices = GameService.choices.findCombinations(dices, isDefi, isSec);
@@ -235,6 +235,6 @@ io.on('connection', socket => {
 
 app.get('/', (req, res) => res.sendFile('index.html'));
 
-http.listen(3000, function () {
-    console.log('listening on *:3000');
+http.listen(443, function () {
+    console.log('listening on *:443');
 });

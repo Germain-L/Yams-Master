@@ -1,0 +1,12 @@
+{
+  "expo": {
+    "extra": {
+      "eas": {
+        "projectId": "ed0d652c-e00b-465a-ac9d-04b97e8bb109"
+      }
+    },
+    "android": {
+      "package": "com.gmn_code.socketioexpobackend"
+    }
+  }
+}
