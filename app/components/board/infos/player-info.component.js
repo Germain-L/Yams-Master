@@ -1,5 +1,5 @@
 import React, {useEffect, useContext, useState} from "react";
-import {View, Text, TouchableOpacity, StyleSheet} from "react-native";
+import {View, Text, StyleSheet} from "react-native";
 import {SocketContext} from "../../../contexts/socket.context";
 
 const PlayerInfos = () => {
@@ -23,13 +23,13 @@ const PlayerInfos = () => {
     );
 };
 
-
-const styles = StyleSheet.create({
-    opponentTimerContainer: {
-        flex: 1,
+const styles = StyleSheet.create({playerInfosContainer: {
+        flex: 7,
         justifyContent: 'center',
         alignItems: 'center',
-    },
-})
+        borderRightWidth: 1,
+        borderColor: 'black',
+        backgroundColor: "lightgrey"
+    }});
 
 export default PlayerInfos;

@@ -1,5 +1,3 @@
-// app/components/board/timers/opponent-timer.component.js
-
 import {SocketContext} from "../../../contexts/socket.context";
 import {useContext, useEffect, useState} from "react";
 import {StyleSheet, View, Text} from "react-native";
