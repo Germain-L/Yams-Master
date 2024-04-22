@@ -6,4 +6,4 @@ COPY ../package.json package-lock.json ./
 
 RUN npm ci
 
-ENTRYPOINT npm start
+ENTRYPOINT ["node", "index.js"]
