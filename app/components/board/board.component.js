@@ -73,12 +73,6 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         backgroundColor: "lightgrey"
     },
-
-    opponentScoreContainer: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
     deckOpponentContainer: {
         flex: 1,
         justifyContent: "center",

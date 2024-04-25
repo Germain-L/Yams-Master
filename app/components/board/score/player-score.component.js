@@ -1,4 +1,4 @@
-import {Text, View} from "react-native";
+import {StyleSheet, Text, View} from "react-native";
 import React from "react";
 
 const PlayerScore = () => {
@@ -9,5 +9,15 @@ const PlayerScore = () => {
         </View>
     );
 };
+
+const styles = StyleSheet.create({
+    playerScoreContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: "lightgrey"
+    },
+});
+
 
 export default PlayerScore;

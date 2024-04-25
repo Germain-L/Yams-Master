@@ -382,35 +382,103 @@ const GameService = {
         },
 
         endGame: {
-            checkFor5: (grid) => {
+            checkFor5InARow: (grid) => {
                 const line = GameService.utils.endGame.checkLineComplete(grid);
-                let column = false;
-                let diag = false;
+                let column = GameService.utils.endGame.checkColumnComplete(grid);
+                let diag = GameService.utils.endGame.checkForDiagComplete(grid);
 
                 return line || column || diag;
             }
         },
 
         checkLineComplete: (grid) => {
-            grid.forEach((row) => {
+            for (let rowIndex = 0; rowIndex < grid.length; rowIndex++) {
+                const row = grid[rowIndex];
                 const ownerToCheck = row[0].owner;
 
                 if (!ownerToCheck) {
-                    // if no owners, we return false
-                    return false;
+                    // If no owners, continue to the next row
+                    continue;
                 }
 
-                row.forEach(cell => {
+                let isComplete = true;
+                for (let cellIndex = 0; cellIndex < row.length; cellIndex++) {
+                    const cell = row[cellIndex];
                     if (cell.owner !== ownerToCheck) {
-                        return false;
+                        // If owner doesn't match, the line is not complete
+                        isComplete = false;
+                        break;
                     }
-                })
+                }
 
-                return true;
-            })
+                if (isComplete) {
+                    // If the line is complete, return true
+                    return true;
+                }
+            }
 
+            // If no complete line is found, return false
             return false;
+        },
+
+
+        checkColumnComplete: (grid) => {
+
+            let hasAtLeastOneColComplete = false;
+
+            columnLoop: for (let colIndex = 0; colIndex < grid[0].length; colIndex++) {
+                let ownerToCheck = null;
+                for (let rowIndex = 0; rowIndex < grid.length; rowIndex++) {
+                    const cell = grid[rowIndex][colIndex];
+                    if (!cell.owner) {
+                        continue columnLoop;
+                    }
+                    if (ownerToCheck === null) {
+                        ownerToCheck = cell.owner;
+                    } else if (cell.owner !== ownerToCheck) {
+                        continue columnLoop;
+                    }
+                }
+                hasAtLeastOneColComplete = true;
+                break;
+            }
+
+            return hasAtLeastOneColComplete;
+        },
+
+        checkForDiagComplete: (grid) => {
+            let topEndOwners = { drcDiag: grid[0][0].owner, dlcDiag: grid[0][4].owner };
+
+            // Initialize flags to track diagonal completeness
+            let hasDownRightDiag = true;
+            let hasDownLeftDiag = true;
+
+            // Iterate through the diagonal cells
+            for (let indexes = { drc: 0, dlc: 4, i: 0 }; indexes.i <= 4; indexes = {
+                drc: indexes.drc + 1,
+                dlc: indexes.dlc - 1,
+                i: indexes.i + 1,
+            }) {
+                // Owners of diagonal cells
+                let drcCellOwner = grid[indexes.i][indexes.drc].owner;
+                let dlcCellOwner = grid[indexes.i][indexes.dlc].owner;
+
+                // Check if diagonal cell owners match the top end owners
+                if (drcCellOwner !== topEndOwners.dlcDiag) {
+                    hasDownRightDiag = false;
+                }
+
+                if (dlcCellOwner !== topEndOwners.drcDiag) {
+                    hasDownLeftDiag = false;
+                }
+
+                // Early return if no complete diagonals are available
+                if (!hasDownRightDiag && !hasDownLeftDiag) {
+                    return false;
+                }
+            }
         }
+
     }
 }
 
