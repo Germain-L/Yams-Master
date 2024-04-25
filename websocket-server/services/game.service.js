@@ -84,7 +84,9 @@ const GAME_INIT = {
         player2Score: 0,
         grid: [],
         choices: {},
-        deck: {}
+        deck: {},
+        player1Tokens: 12,
+        player2Tokens: 12
     }
 }
 const GameService = {
@@ -98,7 +100,6 @@ const GameService = {
             game['gameState']['grid'] = [...GRID_INIT];
             return game;
         },
-
 
         deck: () => {
             return {...DECK_INIT};
@@ -137,7 +138,6 @@ const GameService = {
                     canSelectCells: (playerKey === gameState.currentTurn) && (gameState.choices.availableChoices.length > 0),
                     grid: gameState.grid
                 };
-
             },
 
 
@@ -167,12 +167,20 @@ const GameService = {
                     inGame: false,
                 };
             },
+
             gameTimer: (playerKey, gameState) => {
                 // Selon la clé du joueur on adapte la réponse (player / opponent)
                 const playerTimer = gameState.currentTurn === playerKey ? gameState.timer : 0;
                 const opponentTimer = gameState.currentTurn === playerKey ? 0 : gameState.timer;
                 return {playerTimer: playerTimer, opponentTimer: opponentTimer};
             },
+
+            tokensViewState: (playerKey, gameState) => {
+                return {
+                    playerTokens: playerKey === 'player:1' ? gameState.player1Tokens : gameState.player2Tokens,
+                    opponentTokens: playerKey === 'player:1' ? gameState.player2Tokens : gameState.player1Tokens,
+                }
+            }
         }
     },
 
@@ -327,6 +335,17 @@ const GameService = {
         }
     },
 
+    tokens: {
+        decrementToken: (gameState, playerKey) => {
+            if (playerKey === "player:1") {
+                gameState["player1Tokens"] = --gameState["player1Tokens"]
+            } else if (playerKey === "player:2") {
+                gameState["player2Tokens"] = --gameState["player2Tokens"]
+            }
+
+            return gameState;
+        },
+    },
 
     timer: {
         getTurnDuration: () => {

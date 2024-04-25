@@ -11,7 +11,9 @@
     "react-native-paper": "^5.12.3",
     "react-native-web": "~0.19.6",
     "socket.io-client": "^4.3.2",
-    "uniqid": "^5.4.0"
+    "uniqid": "^5.4.0",
+    "typescript": "^5.3.0",
+    "@types/react": "~18.2.45"
   },
   "scripts": {
     "expo-start": "npx expo start"

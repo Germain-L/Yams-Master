@@ -42,6 +42,13 @@ const updateChoices = (gameIndex) => {
     games[gameIndex].player2Socket.emit('game.choices.view-state', GameService.send.forPlayer.choicesViewState('player:2', games[gameIndex].gameState));
 }
 
+const updateTokens = (gameIndex) => {
+    setTimeout(() => {
+        games[gameIndex].player1Socket.emit('game.tokens.view-state', GameService.send.forPlayer.tokensViewState('player:1', games[gameIndex].gameState));
+        games[gameIndex].player2Socket.emit('game.tokens.view-state', GameService.send.forPlayer.tokensViewState('player:2', games[gameIndex].gameState));
+    }, 200);
+}
+
 const newPlayerInQueue = (socket) => {
 
     queue.push(socket);
@@ -107,6 +114,7 @@ const createGame = (player1Socket, player2Socket) => {
 
     updateGrid(gameIndex);
     updateDecks(gameIndex);
+    updateTokens(gameIndex);
 };
 
 const rollDices = (socket) => {
@@ -164,6 +172,7 @@ const chooseChoice = (socket, data) => {
     // On reset l'état des cases qui étaient précédemment clicables.
     games[gameIndex].gameState.grid = GameService.grid.resetCanBeCheckedCells(games[gameIndex].gameState.grid);
     games[gameIndex].gameState.grid = GameService.grid.selectCell(data.cellId, data.rowIndex, data.cellIndex, games[gameIndex].gameState.currentTurn, games[gameIndex].gameState.grid);
+    games[gameIndex].gameState = GameService.tokens.decrementToken(games[gameIndex].gameState, games[gameIndex].gameState.currentTurn)
 
     // TODO: Ici calculer le score
     // TODO: Puis check si la partie s'arrête (lines / diagolales / no-more-gametokens)
@@ -184,6 +193,7 @@ const chooseChoice = (socket, data) => {
     updateDecks(gameIndex);
     updateChoices(gameIndex);
     updateGrid(gameIndex);
+    updateTokens(gameIndex);
 }
 
 // ---------------------------------------

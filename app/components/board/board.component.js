@@ -8,27 +8,13 @@ import PlayerDeck from "./decks/player-deck.component";
 import OpponentDeck from "./decks/opponent.component";
 import Grid from "./grid/grid.component";
 import Choices from "./choices/choices.component";
-
-const OpponentInfos = () => {
-    return (
-        <View style={styles.opponentInfosContainer}>
-            <Text>Opponent infos</Text>
-        </View>
-    );
-};
+import PlayerInfos from "./infos/player-info.component";
+import OpponentInfos from "./infos/opponent-info.component";
 
 const OpponentScore = () => {
     return (
         <View style={styles.opponentScoreContainer}>
             <Text>Score: </Text>
-        </View>
-    );
-};
-
-const PlayerInfos = () => {
-    return (
-        <View style={styles.playerInfosContainer}>
-            <Text>Player Infos</Text>
         </View>
     );
 };
