@@ -49,6 +49,11 @@ const updateTokens = (gameIndex) => {
     }, 200);
 }
 
+const endGame = (gameIndex) => {
+    games[gameIndex].player1Socket.emit('game.end', GameService.send.forPlayer.endGame('player:1', games[gameIndex].gameState));
+    games[gameIndex].player2Socket.emit('game.end', GameService.send.forPlayer.endGame('player:2', games[gameIndex].gameState));
+}
+
 const newPlayerInQueue = (socket) => {
 
     queue.push(socket);
@@ -79,6 +84,12 @@ const createGame = (player1Socket, player2Socket) => {
 
         // Si le timer tombe à zéro
         if (games[gameIndex].gameState.timer === 0) {
+            if (games[gameIndex].gameState.winner) {
+                endGame(gameIndex);
+                games.splice(games.indexOf(games[gameIndex].gameState), 1);
+                clearInterval(gameInterval);
+                return
+            }
 
             // On change de tour en inversant le clé dans 'currentTurn'
             games[gameIndex].gameState.currentTurn = games[gameIndex].gameState.currentTurn === 'player:1' ? 'player:2' : 'player:1';
@@ -90,6 +101,7 @@ const createGame = (player1Socket, player2Socket) => {
             games[gameIndex].gameState.deck = GameService.init.deck();
             games[gameIndex].gameState.choices = GameService.init.choices();
             games[gameIndex].gameState.grid = GameService.grid.resetCanBeCheckedCells(games[gameIndex].gameState.grid);
+
             updateDecks(gameIndex);
             updateChoices(gameIndex);
             updateGrid(gameIndex);
@@ -177,6 +189,12 @@ const chooseChoice = (socket, data) => {
     // TODO: Ici calculer le score
     // TODO: Puis check si la partie s'arrête (lines / diagolales / no-more-gametokens)
 
+    // TODO FIX
+    games[gameIndex].gameState.winner = GameService.utils.endGame.checkFor5InARow(games[gameIndex].gameState.grid);
+    if (games[gameIndex].gameState.winner !== null) {
+        return
+    }
+
     // Sinon on finit le tour
     games[gameIndex].gameState.currentTurn = games[gameIndex].gameState.currentTurn === 'player:1' ? 'player:2' : 'player:1';
     games[gameIndex].gameState.timer = GameService.timer.getTurnDuration();
@@ -189,11 +207,14 @@ const chooseChoice = (socket, data) => {
     games[gameIndex].player1Socket.emit('game.timer', GameService.send.forPlayer.gameTimer('player:1', games[gameIndex].gameState));
     games[gameIndex].player2Socket.emit('game.timer', GameService.send.forPlayer.gameTimer('player:2', games[gameIndex].gameState));
 
+
     // et on remet à jour la vue
     updateDecks(gameIndex);
     updateChoices(gameIndex);
     updateGrid(gameIndex);
     updateTokens(gameIndex);
+
+
 }
 
 // ---------------------------------------
