@@ -379,6 +379,37 @@ const GameService = {
                 }
             }
             return -1;
+        },
+
+        endGame: {
+            checkFor5: (grid) => {
+                const line = GameService.utils.endGame.checkLineComplete(grid);
+                let column = false;
+                let diag = false;
+
+                return line || column || diag;
+            }
+        },
+
+        checkLineComplete: (grid) => {
+            grid.forEach((row) => {
+                const ownerToCheck = row[0].owner;
+
+                if (!ownerToCheck) {
+                    // if no owners, we return false
+                    return false;
+                }
+
+                row.forEach(cell => {
+                    if (cell.owner !== ownerToCheck) {
+                        return false;
+                    }
+                })
+
+                return true;
+            })
+
+            return false;
         }
     }
 }

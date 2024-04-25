@@ -1,5 +1,3 @@
-// app/components/board/board.component.js
-
 import React from "react";
 import {View, Text, StyleSheet} from 'react-native';
 import OpponentTimer from "./timers/opponent-timer.component";
