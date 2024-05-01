@@ -49,6 +49,13 @@ const updateTokens = (gameIndex) => {
     }, 200);
 }
 
+const updateScore = (gameIndex) => {
+    setTimeout(() => {
+        games[gameIndex].player1Socket.emit('game.score.view-state', GameService.send.forPlayer.scoreViewState('player:1', games[gameIndex].gameState));
+        games[gameIndex].player2Socket.emit('game.score.view-state', GameService.send.forPlayer.scoreViewState('player:2', games[gameIndex].gameState));
+    }, 200);
+}
+
 const endGame = (gameIndex) => {
     games[gameIndex].player1Socket.emit('game.end', GameService.send.forPlayer.endGame('player:1', games[gameIndex].gameState));
     games[gameIndex].player2Socket.emit('game.end', GameService.send.forPlayer.endGame('player:2', games[gameIndex].gameState));
@@ -186,14 +193,19 @@ const chooseChoice = (socket, data) => {
     games[gameIndex].gameState.grid = GameService.grid.selectCell(data.cellId, data.rowIndex, data.cellIndex, games[gameIndex].gameState.currentTurn, games[gameIndex].gameState.grid);
     games[gameIndex].gameState = GameService.tokens.decrementToken(games[gameIndex].gameState, games[gameIndex].gameState.currentTurn)
 
-    // TODO: Ici calculer le score
-    // TODO: Puis check si la partie s'arrête (lines / diagolales / no-more-gametokens)
+    // calcul du score
+    const newScore = GameService.grid.countPoints(games[gameIndex].gameState.grid);
+    if (games[gameIndex].gameState.currentTurn === 'player:1') {
+        games[gameIndex].gameState.player1Score += newScore;
+    } else {
+        games[gameIndex].gameState.player2Score += newScore;
+    }
 
     // TODO FIX
-    games[gameIndex].gameState.winner = GameService.utils.endGame.checkFor5InARow(games[gameIndex].gameState.grid);
-    if (games[gameIndex].gameState.winner !== null) {
-        return
-    }
+    // games[gameIndex].gameState.winner = GameService.utils.endGame.checkFor5InARow(games[gameIndex].gameState.grid);
+    // if (games[gameIndex].gameState.winner !== null) {
+    //     return
+    // }
 
     // Sinon on finit le tour
     games[gameIndex].gameState.currentTurn = games[gameIndex].gameState.currentTurn === 'player:1' ? 'player:2' : 'player:1';
@@ -213,7 +225,7 @@ const chooseChoice = (socket, data) => {
     updateChoices(gameIndex);
     updateGrid(gameIndex);
     updateTokens(gameIndex);
-
+    updateScore(gameIndex);
 
 }
 

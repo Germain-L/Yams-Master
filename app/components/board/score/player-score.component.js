@@ -1,11 +1,23 @@
 import {StyleSheet, Text, View} from "react-native";
-import React from "react";
+import React, {useContext, useEffect, useState} from "react";
+import {SocketContext} from "../../../contexts/socket.context";
 
 const PlayerScore = () => {
 
+    const socket = useContext(SocketContext);
+    const [score, setScore] = useState(0);
+
+    useEffect(() => {
+
+        socket.on("game.score.view-state", (data) => {
+            setScore(data['playerScore'])
+        });
+
+    }, []);
+
     return (
         <View style={styles.playerScoreContainer}>
-            <Text>PlayerScore</Text>
+            <Text>Score : {score}</Text>
         </View>
     );
 };

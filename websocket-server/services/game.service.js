@@ -9,11 +9,11 @@ const CHOICES_INIT = {
 
 const GRID_INIT = [
     [
-        {viewContent: '1', id: 'brelan1', owner: 'player:1', canBeChecked: false},
-        {viewContent: '3', id: 'brelan3', owner: 'player:1', canBeChecked: false},
-        {viewContent: 'Défi', id: 'defi', owner: 'player:1', canBeChecked: false},
-        {viewContent: '4', id: 'brelan4', owner: 'player:1', canBeChecked: false},
-        {viewContent: '6', id: 'brelan6', owner: 'player:1', canBeChecked: false},
+        {viewContent: '1', id: 'brelan1', owner: null, canBeChecked: false},
+        {viewContent: '3', id: 'brelan3', owner: null, canBeChecked: false},
+        {viewContent: 'Défi', id: 'defi', owner: null, canBeChecked: false},
+        {viewContent: '4', id: 'brelan4', owner: null, canBeChecked: false},
+        {viewContent: '6', id: 'brelan6', owner: null, canBeChecked: false},
     ],
     [
         {viewContent: '2', id: 'brelan2', owner: null, canBeChecked: false},
@@ -178,6 +178,13 @@ const GameService = {
                 };
             },
 
+            scoreViewState: (playerKey, gameState) => {
+                return {
+                    playerScore: playerKey === 'player:1' ? gameState.player1Score : gameState.player2Score,
+                    opponentScore: playerKey === 'player:1' ? gameState.player2Score : gameState.player1Score,
+                };
+            },
+
             gameTimer: (playerKey, gameState) => {
                 // Selon la clé du joueur on adapte la réponse (player / opponent)
                 const playerTimer = gameState.currentTurn === playerKey ? gameState.timer : 0;
@@ -267,7 +274,46 @@ const GameService = {
             })
 
             return grid;
+        },
+
+        countPoints: (grid) => {
+            const directions = [
+                {dr: 0, dc: 1},
+                {dr: 1, dc: 0},
+                {dr: 1, dc: 1},
+                {dr: 1, dc: -1}
+            ];
+
+            let score = 0;
+
+            const checkLine = (row, col, dr, dc, owner) => {
+                let length = 0;
+                while (grid[row] && grid[row][col] && grid[row][col].owner === owner) {
+                    length++;
+                    row += dr;
+                    col += dc;
+                }
+                return length;
+            };
+
+            grid.forEach((row, rowIndex) => {
+                row.forEach((cell, colIndex) => {
+                    if (cell.owner) {
+                        directions.forEach(({dr, dc}) => {
+                            if (!(grid[rowIndex - dr] && grid[rowIndex - dr][colIndex - dc] && grid[rowIndex - dr][colIndex - dc].owner === cell.owner)) {
+                                const length = checkLine(rowIndex, colIndex, dr, dc, cell.owner);
+                                if (length >= 3) {
+                                    score += length - 2;
+                                }
+                            }
+                        });
+                    }
+                });
+            });
+
+            return score;
         }
+
     },
 
 
