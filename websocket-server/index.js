@@ -86,6 +86,12 @@ const createGame = (player1Socket, player2Socket) => {
 
     const gameIndex = GameService.utils.findGameIndexById(games, newGame.idGame);
     const gameInterval = setInterval(() => {
+        if (games[gameIndex].gameState.winner) {
+            endGame(gameIndex);
+            games.splice(games.indexOf(games[gameIndex].gameState), 1);
+            clearInterval(gameInterval);
+            return
+        }
 
         games[gameIndex].gameState.timer--;
 
@@ -201,11 +207,17 @@ const chooseChoice = (socket, data) => {
         games[gameIndex].gameState.player2Score += newScore;
     }
 
-    // TODO FIX
-    // games[gameIndex].gameState.winner = GameService.utils.endGame.checkFor5InARow(games[gameIndex].gameState.grid);
-    // if (games[gameIndex].gameState.winner !== null) {
-    //     return
-    // }
+    // Ajout de la vérification de l'alignement de cinq après la sélection d'une cellule
+    const winner = GameService.utils.endGame.checkForFiveAligned(games[gameIndex].gameState.grid);
+    if (winner) {
+        games[gameIndex].gameState.winner = winner;
+        setTimeout(() => {
+            endGame(gameIndex);
+            // remove the game from the games array
+        }, 2000);
+
+        return;
+    }
 
     // Sinon on finit le tour
     games[gameIndex].gameState.currentTurn = games[gameIndex].gameState.currentTurn === 'player:1' ? 'player:2' : 'player:1';

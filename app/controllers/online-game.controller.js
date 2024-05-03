@@ -35,10 +35,24 @@ export default function OnlineGameController({navigation}) {
             setIdOpponent(data['idOpponent']);
         });
 
+        socket.on('game.end', (data) => {
+            console.log('[listen][game.end]:', data);
+            setInQueue(data['inQueue']);
+            setInGame(data['inGame']);
+            setIdOpponent(null);
+
+            // Navigate with data
+            navigation.navigate('EndGameScreen', {
+                winner: data['winner'],
+                score: data['score'],
+                opponentScore: data['opponentScore'],
+            });
+        });
+
         socket.on('queue.leave', () => {
             console.log("leaving queue")
             navigation.navigate('HomeScreen')
-    });
+        });
 
     }, []);
 

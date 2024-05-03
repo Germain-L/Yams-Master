@@ -9,28 +9,28 @@ const CHOICES_INIT = {
 
 const GRID_INIT = [
     [
-        {viewContent: '1', id: 'brelan1', owner: null, canBeChecked: false},
-        {viewContent: '3', id: 'brelan3', owner: null, canBeChecked: false},
-        {viewContent: 'Défi', id: 'defi', owner: null, canBeChecked: false},
-        {viewContent: '4', id: 'brelan4', owner: null, canBeChecked: false},
+        {viewContent: '1', id: 'brelan1', owner: 'player:1', canBeChecked: false},
+        {viewContent: '3', id: 'brelan3', owner: 'player:1', canBeChecked: false},
+        {viewContent: 'Défi', id: 'defi', owner: 'player:1', canBeChecked: false},
+        {viewContent: '4', id: 'brelan4', owner: 'player:1', canBeChecked: false},
         {viewContent: '6', id: 'brelan6', owner: null, canBeChecked: false},
     ],
     [
-        {viewContent: '2', id: 'brelan2', owner: null, canBeChecked: false},
+        {viewContent: '2', id: 'brelan2', owner: 'player:1', canBeChecked: false},
         {viewContent: 'Carré', id: 'carre', owner: null, canBeChecked: false},
         {viewContent: 'Sec', id: 'sec', owner: null, canBeChecked: false},
         {viewContent: 'Full', id: 'full', owner: null, canBeChecked: false},
         {viewContent: '5', id: 'brelan5', owner: null, canBeChecked: false},
     ],
     [
-        {viewContent: '≤8', id: 'moinshuit', owner: null, canBeChecked: false},
+        {viewContent: '≤8', id: 'moinshuit', owner: 'player:1', canBeChecked: false},
         {viewContent: 'Full', id: 'full', owner: null, canBeChecked: false},
         {viewContent: 'Yam', id: 'yam', owner: null, canBeChecked: false},
         {viewContent: 'Défi', id: 'defi', owner: null, canBeChecked: false},
         {viewContent: 'Suite', id: 'suite', owner: null, canBeChecked: false},
     ],
     [
-        {viewContent: '6', id: 'brelan6', owner: null, canBeChecked: false},
+        {viewContent: '6', id: 'brelan6', owner: 'player:1', canBeChecked: false},
         {viewContent: 'Sec', id: 'sec', owner: null, canBeChecked: false},
         {viewContent: 'Suite', id: 'suite', owner: null, canBeChecked: false},
         {viewContent: '≤8', id: 'moinshuit', owner: null, canBeChecked: false},
@@ -143,11 +143,11 @@ const GameService = {
 
             endGame: (playerKey, gameState) => {
                 return {
-                    winner: gameState.winner ? playerKey === true : false,
+                    winner: gameState.winner === playerKey,
                     endGame: true,
                     playerScore: playerKey === 'player:1' ? gameState.player1Score : gameState.player2Score,
                     opponentScore: playerKey === 'player:1' ? gameState.player2Score : gameState.player1Score
-                }
+                };
             },
 
 
@@ -438,110 +438,35 @@ const GameService = {
         },
 
         endGame: {
-            checkFor5InARow: (grid) => {
-                const line = GameService.utils.endGame.checkLineComplete(grid);
-                let column = GameService.utils.endGame.checkColumnComplete(grid);
-                let diag = GameService.utils.endGame.checkForDiagComplete(grid);
+            checkForFiveAligned: (grid) => {
+                const size = 5; // La grille est de 5x5
 
-                // Return the string in line or if not,
-                // the column or if not,
-                // the diag or if not,
-                // we return nothing
-                return line ?
-                    line : column ?
-                        column : diag ?
-                            diag : null;
-            },
+                // Fonction helper pour vérifier si cinq cases consécutives sont du même propriétaire
+                const checkFiveConsecutive = (cells) => {
+                    const first = cells[0].owner;
+                    return first && cells.every(cell => cell.owner === first);
+                };
 
-
-            checkLineComplete: (grid) => {
-                for (let rowIndex = 0; rowIndex < grid.length; rowIndex++) {
-                    const row = grid[rowIndex];
-                    const ownerToCheck = row[0].owner;
-
-                    if (!ownerToCheck) {
-                        // If no owners, continue to the next row
-                        continue;
-                    }
-
-                    let isComplete = true;
-                    for (let cellIndex = 0; cellIndex < row.length; cellIndex++) {
-                        const cell = row[cellIndex];
-                        if (cell.owner !== ownerToCheck) {
-                            // If owner doesn't match, the line is not complete
-                            isComplete = false;
-                            break;
-                        }
-                    }
-
-                    if (isComplete) {
-                        // If the line is complete, return true
-                        return ownerToCheck;
+                // Vérifier les lignes et les colonnes
+                for (let i = 0; i < size; i++) {
+                    if (checkFiveConsecutive(grid[i]) || checkFiveConsecutive(grid.map(row => row[i]))) {
+                        return grid[i][0].owner; // Retourne le propriétaire si trouvé
                     }
                 }
 
-                // If no complete line is found, return false
-                return null;
-            },
-
-
-            checkColumnComplete: (grid) => {
-
-                let hasAtLeastOneColComplete = null;
-
-                columnLoop: for (let colIndex = 0; colIndex < grid[0].length; colIndex++) {
-                    let ownerToCheck = null;
-                    for (let rowIndex = 0; rowIndex < grid.length; rowIndex++) {
-                        const cell = grid[rowIndex][colIndex];
-                        if (!cell.owner) {
-                            continue columnLoop;
-                        }
-                        if (ownerToCheck === null) {
-                            ownerToCheck = cell.owner;
-                        } else if (cell.owner !== ownerToCheck) {
-                            continue columnLoop;
-                        }
-                    }
-                    hasAtLeastOneColComplete = ownerToCheck;
-                    break;
+                // Vérifier les diagonales
+                const diag1 = [];
+                const diag2 = [];
+                for (let i = 0; i < size; i++) {
+                    diag1.push(grid[i][i]);
+                    diag2.push(grid[i][size - 1 - i]);
+                }
+                if (checkFiveConsecutive(diag1) || checkFiveConsecutive(diag2)) {
+                    return diag1[0].owner; // Retourne le propriétaire si trouvé
                 }
 
-                return hasAtLeastOneColComplete;
+                return null; // Pas de gagnant trouvé
             },
-
-            checkForDiagComplete: (grid) => {
-                // Initialize flags to track diagonal completeness
-                let hasDownRightDiag = grid[0][0].owner;
-                let hasDownLeftDiag = grid[0][4].owner;
-
-                // Iterate through the diagonal cells
-                for (let indexes = {drc: 0, dlc: 4, i: 0}; indexes.i <= 4; indexes = {
-                    drc: indexes.drc + 1,
-                    dlc: indexes.dlc - 1,
-                    i: indexes.i + 1,
-                }) {
-                    // Owners of diagonal cells
-                    let drcCellOwner = grid[indexes.i][indexes.drc].owner;
-                    let dlcCellOwner = grid[indexes.i][indexes.dlc].owner;
-
-                    // Check if diagonal cell owners match the top end owners
-                    if (drcCellOwner !== hasDownRightDiag) {
-                        hasDownRightDiag = false;
-                    }
-
-                    if (dlcCellOwner !== hasDownLeftDiag) {
-                        hasDownLeftDiag = false;
-                    }
-
-                    // Early return if no complete diagonals are available
-                    if (!hasDownRightDiag && !hasDownLeftDiag) {
-                        return null;
-                    }
-                }
-
-                // we need to do this to return a string with the winner name
-                return hasDownRightDiag ? hasDownRightDiag : hasDownLeftDiag;
-            }
         },
     }
 }
