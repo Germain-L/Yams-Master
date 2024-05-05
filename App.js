@@ -7,6 +7,7 @@ import OnlineGameScreen from './app/screens/online-game.screen';
 import VsBotGameScreen from './app/screens/vs-bot-game.screen';
 import {SocketContext, socket} from './app/contexts/socket.context';
 import EndGameScreen from "./app/screens/end-game.screen";
+import {HeaderCustom} from "./app/components/header/headerCustom.component";
 
 const Stack = createStackNavigator();
 LogBox.ignoreAllLogs(true);
@@ -16,7 +17,7 @@ function App() {
         <SocketContext.Provider value={socket}>
             <NavigationContainer>
                 <Stack.Navigator initialRouteName="HomeScreen">
-                    <Stack.Screen name="HomeScreen" component={HomeScreen}/>
+                    <Stack.Screen name="HomeScreen" component={HomeScreen} options={{ headerRight: (props) => <HeaderCustom /> }}/>
                     <Stack.Screen name="OnlineGameScreen" component={OnlineGameScreen}/>
                     <Stack.Screen name="VsBotGameScreen" component={VsBotGameScreen}/>
                     <Stack.Screen name="EndGameScreen" component={EndGameScreen}/>
