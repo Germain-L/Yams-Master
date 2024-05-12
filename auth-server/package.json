@@ -1,0 +1,35 @@
+{
+  "name": "auth-server",
+  "version": "1.0.0-SNAPSHOT",
+  "description": "Auth Server for Yams Master",
+  "main": "index.js",
+  "scripts": {
+    "start": "cross-env NODE_ENV=dev tsc-watch --onSuccess \"node ./build/index.js\"",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "tsc -p . "
+  },
+  "author": "ClemLcs",
+  "license": "MIT",
+  "dependencies": {
+    "bcrypt": "^5.1.1",
+    "cookie-parser": "^1.4.6",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "joi": "^17.13.1",
+    "jsonwebtoken": "^9.0.2",
+    "mongodb": "^6.6.1",
+    "multer": "^1.4.5-lts.1",
+    "nodemon": "^3.1.0",
+    "typescript": "^5.4.5"
+  },
+  "devDependencies": {
+    "@types/bcrypt": "^5.0.2",
+    "@types/compression": "^1.7.5",
+    "@types/cookie-parser": "^1.4.7",
+    "@types/jsonwebtoken": "^9.0.6",
+    "@types/multer": "^1.4.7",
+    "cross-env": "^7.0.3",
+    "path": "^0.12.7",
+    "tsc-watch": "^6.0.4"
+  }
+}

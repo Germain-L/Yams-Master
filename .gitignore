@@ -2,3 +2,7 @@ node_modules/
 .expo/
 .idea/
 .venv/
+auth-server/.env
+auth-server/build
+auth-server/node_modules
+websocket-server/node_modules
