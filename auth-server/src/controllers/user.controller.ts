@@ -24,7 +24,7 @@ export class UserController {
             if (newUser) {
                 res.status(200).json({
                     "status": "success",
-                    "userInfo": process.env.API_HOSTNAME + "/api" + process.env.API_VERSION + "/auth/me"
+                    "userInfo": process.env.API_HOSTNAME + "/api" + "/auth/me"
                 });
             } else {
                 res.status(500).send({
@@ -50,7 +50,7 @@ export class UserController {
                 if (image && newImageUser) {
                     res.status(200).json({
                         "status": "success",
-                        "userInfo": process.env.API_HOSTNAME + "/api" + process.env.API_VERSION + "/auth/me"
+                        "userInfo": process.env.API_HOSTNAME + "/api" +  "/auth/me"
                     });
                 } else {
                     res.status(500).send({

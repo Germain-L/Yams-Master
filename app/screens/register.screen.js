@@ -12,16 +12,17 @@ import {
 } from "@mui/material";
 import Button from "@mui/material/Button";
 import { Link } from '@react-navigation/native';
+import AuthController from "../controllers/auth.controller";
 
 export default function RegisterScreen({navigation}){
 
     const handleSubmit = (event) => {
         event.preventDefault();
         const data = new FormData(event.currentTarget);
-        console.log({
-            email: data.get('email'),
-            password: data.get('password'),
-        });
+        const authController = new AuthController();
+
+        authController.register(data.get('firstName'), data.get('lastName'), data.get('email'), data.get('password')).then(r => console.log(r));
+
     };
 
     return (
@@ -87,6 +88,7 @@ export default function RegisterScreen({navigation}){
                         </Grid>
                         <Grid item xs={12}>
                             <FormControlLabel
+                                required={true}
                                 control={<Checkbox value="allowExtraEmails" color="primary" />}
                                 label="En vous inscrivant, vous acceptez le traitement de vos données personnelles par Yams Master, tel que décrit dans la déclaration de confidentialité."
                             />

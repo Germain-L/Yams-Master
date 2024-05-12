@@ -17,16 +17,15 @@ Cf. [Release section](https://github.com/Germain-L/Yams-Master/releases)
 
 To run this project, you will need to add the following environment variables into your file : `.env`
 
-| Name             | Type   | Description                                  |
-|------------------|--------|----------------------------------------------|
-| JWTKEY           | string | JWT Secrets                                  |
-| MONGODB_URI      | string | Mongo URL                                    |
-| MONGODB_DATABASE | string | Mongo Database name                          |
-| FRONTEND_URL     | string | Expo Web App                                 |
-| NODE_ENV         | string | Express Environment (development/production) |
-| API_HOSTNAME     | string | API Hostname                                 |
-| API_VERSION      | string | API version                                  |
-| PORT             | string | Express Port                                 |
+| Name             | Example                                                                                     | Type   | Description                                  |
+|------------------|---------------------------------------------------------------------------------------------|--------|----------------------------------------------|
+| JWTKEY           | MyScretKey                                                                                  | string | JWT Secrets                                  |
+| MONGODB_URI      | [MongoDB Atlas](https://www.mongodb.com/resources/products/platform/mongodb-atlas-tutorial) | string | Mongo URL                                    |
+| MONGODB_DATABASE | yams_master                                                                                 | string | Mongo Database name                          |
+| FRONTEND_URL     | http://localhost:8081                                                                       | string | Expo Web App                                 |
+| NODE_ENV         | development                                                                                 | string | Express Environment (development/production) |
+| API_HOSTNAME     | localhost                                                                                   | string | API Hostname                                 |
+| PORT             | 3002                                                                                        | string | Express Port                                 |
 
 
 
@@ -42,7 +41,7 @@ To run this project, you will need to add the following environment variables in
 Go to the project directory
 
 ```bash
-  cd api
+  cd Yams-Master/auth-server
 ```
 
 ### Install dependencies

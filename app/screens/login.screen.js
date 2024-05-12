@@ -14,34 +14,20 @@ import {faLock} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import { Link } from '@react-navigation/native';
 import {faMicrosoft} from "@fortawesome/free-brands-svg-icons";
+import AuthController from "../controllers/auth.controller";
 
 export default function LoginScreen({navigation}) {
     const handleSubmit = (event) => {
         event.preventDefault();
         const data = new FormData(event.currentTarget);
-        console.log({
-            email: data.get('email'),
-            password: data.get('password'),
-        });
+
+        const authController = new AuthController();
+        authController.login(data.get('email'), data.get('password')).then(r => console.log(r))
     };
 
     return (
         <Grid container component="main" sx={{ height: '100vh' }}>
             <CssBaseline />
-            <Grid
-                item
-                xs={false}
-                sm={4}
-                md={7}
-                sx={{
-                    backgroundImage: 'url(https://source.unsplash.com/random?wallpapers)',
-                    backgroundRepeat: 'no-repeat',
-                    backgroundColor: (t) =>
-                        t.palette.mode === 'light' ? t.palette.grey[50] : t.palette.grey[900],
-                    backgroundSize: 'cover',
-                    backgroundPosition: 'center',
-                }}
-            />
             <Grid item component={Paper} elevation={6} square>
                 <Box
                     sx={{
@@ -104,6 +90,20 @@ export default function LoginScreen({navigation}) {
                     </Box>
                 </Box>
             </Grid>
+            <Grid
+                item
+                xs={false}
+                sm={4}
+                md={7}
+                sx={{
+                    backgroundImage: 'url(https://source.unsplash.com/random?wallpapers)',
+                    backgroundRepeat: 'no-repeat',
+                    backgroundColor: (t) =>
+                        t.palette.mode === 'light' ? t.palette.grey[50] : t.palette.grey[900],
+                    backgroundSize: 'cover',
+                    backgroundPosition: 'center',
+                }}
+            />
         </Grid>
     );
 };
